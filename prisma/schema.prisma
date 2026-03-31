@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  password  String
+  name      String
+  role      Role       @default(CLIENT)
+  createdAt DateTime   @default(now())
+  properties Property[]
+}
+
+enum Role {
+  ADMIN
+  CLIENT
+}
+
+model Property {
+  id              String       @id @default(cuid())
+  name            String
+  propertyType    String       @default("Villa")
+  address         String?
+  description     String?
+  depositAmount   Float        @default(600)
+  userId          String
+  user            User         @relation(fields: [userId], references: [id])
+  checkInToken    String?      @unique
+  checkOutToken   String?      @unique
+  createdAt       DateTime     @default(now())
+  checkIns        CheckIn[]
+  checkOuts       CheckOut[]
+  documents       PropertyDocument[]
+}
+
+model PropertyDocument {
+  id          String   @id @default(cuid())
+  propertyId   String
+  property     Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  name        String
+  fileName    String
+  filePath    String
+  fileSize    Int
+  mimeType    String
+  createdAt   DateTime @default(now())
+}
+
+model CheckIn {
+  id                  String    @id @default(cuid())
+  propertyId          String
+  property            Property  @relation(fields: [propertyId], references: [id])
+  guestName           String
+  guestEmail          String
+  arrivalDate         DateTime
+  departureDate       DateTime
+  estimatedDepartureHour String
+  numberOfGuests      Int
+  depositConfirmed    Boolean   @default(false)
+  conditionConfirmed  Boolean   @default(false)
+  signatureDataUrl    String?   @db.Text
+  createdAt           DateTime  @default(now())
+}
+
+model CheckOut {
+  id                  String    @id @default(cuid())
+  propertyId          String
+  property            Property  @relation(fields: [propertyId], references: [id])
+  guestName           String
+  depositReturned     Boolean   @default(false)
+  incidentDescription String?
+  createdAt           DateTime  @default(now())
+}
