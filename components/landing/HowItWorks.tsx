@@ -11,7 +11,7 @@ export function HowItWorks() {
   const t = translations[language].how_it_works;
 
   return (
-    <section className="py-24 bg-white">
+    <section id="how-it-works" className="py-24 bg-white">
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-16">
           <span className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-600 border border-indigo-100 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">

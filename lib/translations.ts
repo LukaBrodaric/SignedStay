@@ -8,17 +8,17 @@ export const translations = {
       logIn: "Prijava",
     },
     hero: {
-      badge: "✦ Pouzdano rješenje za iznajmljivače diljem Mediterana",
-      headline: "Digitalni Check-In i Check-Out za vaše iznajmljivane objekte",
-      cta_primary: "Počnite upravljati objektima",
+      badge: "✦ Pouzdano rješenje za iznajmljivače diljem Europe",
+      headline: "Digitalna Check-In i Check-Out potvrda za vaše nekretnine",
+      cta_primary: "Započnite s korištenjem",
       cta_secondary: "Pogledajte kako funkcionira",
       below_cta: "30€/godišnje po objektu · Bez naknada za postavljanje · Otkazivanje u bilo trenutku",
       signaturePad: "Potpis",
     },
     features: {
       badge: "Funkcionalnosti",
-      title: "Sve što trebate, ništa što ne trebate",
-      subtitle: "Moćne značajke dizajnirane posebno za vlasnike apartmana za odmor",
+      title: "Sve što vam treba na jednom mjestu",
+      subtitle: "Signed Stay je namijenjen svima koji žele profesionalno upravljati iznajmljivanjem i izbjeći probleme s gostima.",
       items: [
         {
           title: "Jedinstveni linkovi za goste",
@@ -93,7 +93,7 @@ export const translations = {
       badge: "Za koga?",
       headline: "Kome je namijenjen SignedStay?",
       body: "Signed Stay je namijenjen svima koji žele profesionalno upravljati iznajmljivanjem i izbjeći probleme s gostima.",
-      sub: "Idealno za:",
+      sub: "Sustav je idealan za:",
       users: [
         "Vlasnici vila",
         "Iznajmljivači apartmana",
@@ -135,7 +135,7 @@ export const translations = {
         {
           title: "Organizirana evidencija",
           description: "Svaka prijava, potpis i dokument sigurno se pohranjuju. Pretražujte i izvozite kad god vam treba.",
-          stat: "10god",
+          stat: "10 god",
           statLabel: "čuvanje dokumenata",
         },
         {
@@ -153,10 +153,10 @@ export const translations = {
     },
     pricing: {
       badge: "Jednostavne cijene",
-      title: "Jedan plan. Sve uključeno.",
+      title: "Jedna cijena. Sve uključeno.",
       price: "€30",
       per: "po objektu / godišnje",
-      sub: "Godišnja naplata. Bez mjesečnih iznenađenja.",
+      sub: "Transparenta godišnja naplata. Bez mjesečnih iznenađenja.",
       features: [
         "Neograničene prijave i odjave",
         "Prikupljanje digitalnih potpisa",
@@ -192,7 +192,7 @@ export const translations = {
       address: "Adresa",
       quickResponse: "Brzi odgovor",
       quickResponseText: "Obično odgovaramo unutar 2-4 sata tijekom radnog vremena.",
-      supportHours: "Sati podrške:",
+      supportHours: "Korisnička podrška:",
       weekdays: "Pon-Pet: 9:00 - 18:00",
       saturday: "Sub: 10:00 - 14:00",
     },
@@ -224,7 +224,7 @@ export const translations = {
     },
     final_cta: {
       badge: "Počnite danas",
-      title: "Započnite s korištenjem SignedStay već danas",
+      title: "Započnite s korištenjem SignedStay sustava već danas",
       text: "Postavite svoj prvi objekt u nekoliko minuta i počnite koristiti digitalni check-in i check-out već pri sljedećem dolasku gostiju.",
       button: "Kontaktirajte nas",
       subtext: "30€/godišnje po objektu · Bez ugovora",
