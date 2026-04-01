@@ -20,11 +20,18 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { guestName, depositReturned, incidentDescription } = body;
+    const { guestName, depositReturned, incidentDescription, signatureDataUrl } = body;
 
     if (guestName === undefined || depositReturned === undefined) {
       return NextResponse.json(
         { error: "All fields are required" },
+        { status: 400 }
+      );
+    }
+
+    if (!signatureDataUrl) {
+      return NextResponse.json(
+        { error: "Signature is required" },
         { status: 400 }
       );
     }
@@ -35,6 +42,7 @@ export async function POST(
         guestName,
         depositReturned,
         incidentDescription: incidentDescription || null,
+        signatureDataUrl,
       },
     });
 

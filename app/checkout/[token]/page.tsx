@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { SignaturePad } from "@/components/forms/SignatureCanvas";
 import { CheckCircle, Home, ArrowLeft } from "lucide-react";
 
 interface Property {
@@ -29,6 +30,7 @@ export default function CheckOutPage() {
     guestName: "",
     depositReturned: false,
     incidentDescription: "",
+    signatureDataUrl: "",
   });
 
   useEffect(() => {
@@ -62,6 +64,11 @@ export default function CheckOutPage() {
 
     if (formData.depositReturned === false && !formData.incidentDescription) {
       setError("Please describe the issue with the deposit.");
+      return;
+    }
+
+    if (!formData.signatureDataUrl) {
+      setError("Please provide your signature.");
       return;
     }
 
@@ -242,6 +249,17 @@ export default function CheckOutPage() {
                   />
                 </div>
               )}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                  Signature <span className="text-red-500">*</span>
+                </label>
+                <SignaturePad
+                  onChange={(dataUrl) =>
+                    setFormData({ ...formData, signatureDataUrl: dataUrl || "" })
+                  }
+                />
+              </div>
 
               <Button
                 type="submit"

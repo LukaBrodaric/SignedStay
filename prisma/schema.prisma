@@ -74,5 +74,6 @@ model CheckOut {
   guestName           String
   depositReturned     Boolean   @default(false)
   incidentDescription String?
+  signatureDataUrl    String?   @db.Text
   createdAt           DateTime  @default(now())
 }

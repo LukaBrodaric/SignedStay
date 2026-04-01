@@ -7,8 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
-import { Plus, Copy, RefreshCw, Pencil, Building2 } from "lucide-react";
+import { Plus, Copy, RefreshCw, Pencil, Building2, Trash2, X, AlertTriangle } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 interface User {
   id: string;
@@ -26,6 +27,10 @@ interface Property {
   user: {
     name: string;
   };
+  _count?: {
+    checkIns: number;
+    checkOuts: number;
+  };
 }
 
 export default function AdminPropertiesPage() {
@@ -36,6 +41,11 @@ export default function AdminPropertiesPage() {
   const [loading, setLoading] = useState(false);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [deleteModal, setDeleteModal] = useState<{ open: boolean; property: Property | null }>({
+    open: false,
+    property: null,
+  });
+  const [deleting, setDeleting] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -104,6 +114,30 @@ export default function AdminPropertiesPage() {
     await navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteModal.property) return;
+
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/properties?id=${deleteModal.property.id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        toast.success("Property deleted successfully");
+        setProperties(properties.filter((p) => p.id !== deleteModal.property!.id));
+        setDeleteModal({ open: false, property: null });
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Failed to delete property");
+      }
+    } catch (error) {
+      toast.error("Failed to delete property");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -334,6 +368,15 @@ export default function AdminPropertiesPage() {
                             />
                             {property.checkInToken ? "Regenerate" : "Generate"}
                           </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-9 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => setDeleteModal({ open: true, property })}
+                          >
+                            <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                            Delete
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -365,6 +408,59 @@ export default function AdminPropertiesPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModal.open && deleteModal.property && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="mx-4 w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                </div>
+                <h2 className="text-lg font-semibold text-gray-900">Delete Property</h2>
+              </div>
+              <button
+                onClick={() => setDeleteModal({ open: false, property: null })}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="mb-6">
+              <p className="text-gray-600 mb-3">
+                Are you sure you want to delete this property?
+              </p>
+              <div className="rounded-lg bg-gray-50 p-3">
+                <p className="font-medium text-gray-900">{deleteModal.property.name}</p>
+                {deleteModal.property.address && (
+                  <p className="text-sm text-gray-500">{deleteModal.property.address}</p>
+                )}
+              </div>
+              <p className="mt-3 text-sm text-amber-600">
+                This will also delete all check-in and check-out records associated with this property.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setDeleteModal({ open: false, property: null })}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                className="flex-1"
+                onClick={handleDelete}
+                disabled={deleting}
+              >
+                {deleting ? "Deleting..." : "Delete Property"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
