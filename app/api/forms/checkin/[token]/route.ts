@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sendCheckInConfirmation } from "@/lib/email";
+import { sendCheckinGuestEmail, sendCheckinOwnerEmail } from "@/lib/email";
+
+function formatDate(date: string | Date): string {
+  return new Date(date).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
 
 export async function POST(
   request: Request,
@@ -12,6 +20,7 @@ export async function POST(
     const property = await prisma.property.findFirst({
       where: { checkInToken: token },
       include: {
+        user: true,
         documents: true,
       },
     });
@@ -69,21 +78,36 @@ export async function POST(
     });
 
     try {
-      await sendCheckInConfirmation(
-        guestEmail,
+      await sendCheckinGuestEmail({
+        to: guestEmail,
         guestName,
-        property.name,
-        {
-          guestName,
-          guestEmail,
-          arrivalDate: new Date(arrivalDate),
-          departureDate: new Date(departureDate),
-          numberOfGuests: parseInt(numberOfGuests),
-        },
-        property.documents
-      );
+        propertyName: property.name,
+        propertyType: property.propertyType,
+        arrivalDate: formatDate(arrivalDate),
+        departureDate: formatDate(departureDate),
+        estimatedDepartureHour,
+        numberOfGuests: parseInt(numberOfGuests),
+        depositConfirmed,
+        conditionConfirmed,
+        documents: property.documents.map(d => ({ filePath: d.filePath, displayName: d.name })),
+      });
+
+      await sendCheckinOwnerEmail({
+        to: property.user.email,
+        ownerName: property.user.name,
+        guestName,
+        guestEmail,
+        propertyName: property.name,
+        propertyType: property.propertyType,
+        arrivalDate: formatDate(arrivalDate),
+        departureDate: formatDate(departureDate),
+        estimatedDepartureHour,
+        numberOfGuests: parseInt(numberOfGuests),
+        depositConfirmed,
+        conditionConfirmed,
+      });
     } catch (emailError) {
-      console.error("Failed to send confirmation email:", emailError);
+      console.error("Failed to send confirmation emails:", emailError);
     }
 
     return NextResponse.json({

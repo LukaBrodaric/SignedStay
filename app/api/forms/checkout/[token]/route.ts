@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendCheckoutGuestEmail, sendCheckoutOwnerEmail } from "@/lib/email";
 
 export async function POST(
   request: Request,
@@ -8,8 +9,9 @@ export async function POST(
   try {
     const { token } = await params;
 
-    const property = await prisma.property.findFirst({
+    const property = await prisma.property.findUnique({
       where: { checkOutToken: token },
+      include: { user: true },
     });
 
     if (!property) {
@@ -45,6 +47,42 @@ export async function POST(
         signatureDataUrl,
       },
     });
+
+    const lastCheckIn = await prisma.checkIn.findFirst({
+      where: { propertyId: property.id },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const today = new Date().toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+
+    try {
+      if (lastCheckIn) {
+        await sendCheckoutGuestEmail({
+          to: lastCheckIn.guestEmail,
+          guestName,
+          propertyName: property.name,
+          depositReturned,
+          incidentDescription,
+          checkOutDate: today,
+        });
+      }
+
+      await sendCheckoutOwnerEmail({
+        to: property.user.email,
+        ownerName: property.user.name,
+        guestName,
+        propertyName: property.name,
+        depositReturned,
+        incidentDescription,
+        checkOutDate: today,
+      });
+    } catch (emailError) {
+      console.error("Failed to send checkout emails:", emailError);
+    }
 
     return NextResponse.json({
       success: true,

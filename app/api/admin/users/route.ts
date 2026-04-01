@@ -130,7 +130,12 @@ export async function POST(request: Request) {
     revalidatePath("/admin/users");
 
     try {
-      await sendWelcomeEmail(email, name, password);
+      await sendWelcomeEmail({
+        to: email,
+        userName: name,
+        email: email,
+        temporaryPassword: password,
+      });
     } catch (emailError) {
       console.error("Failed to send welcome email:", emailError);
     }

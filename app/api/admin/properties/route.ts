@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendNewPropertyEmail } from "@/lib/email";
 
 export async function DELETE(request: Request) {
   try {
@@ -94,6 +95,22 @@ export async function POST(request: Request) {
     });
 
     revalidatePath("/admin/properties");
+
+    try {
+      const owner = await prisma.user.findUnique({ where: { id: userId } });
+      if (owner) {
+        await sendNewPropertyEmail({
+          to: owner.email,
+          userName: owner.name,
+          propertyName: property.name,
+          propertyType: property.propertyType,
+          address: property.address ?? undefined,
+          depositAmount: property.depositAmount,
+        });
+      }
+    } catch (emailError) {
+      console.error("Failed to send new property email:", emailError);
+    }
 
     return NextResponse.json(property);
   } catch (error) {
