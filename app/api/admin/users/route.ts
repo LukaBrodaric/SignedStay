@@ -81,6 +81,9 @@ export async function GET() {
       name: true,
       email: true,
       createdAt: true,
+      _count: {
+        select: { properties: true },
+      },
     },
     orderBy: { createdAt: "desc" },
   });
