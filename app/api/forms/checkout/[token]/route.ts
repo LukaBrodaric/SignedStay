@@ -3,10 +3,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(
   request: Request,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
-    const token = params.token;
+    const { token } = await params;
 
     const property = await prisma.property.findFirst({
       where: { checkOutToken: token },

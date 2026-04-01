@@ -24,13 +24,15 @@ export function PropertyCard({ property }: PropertyCardProps) {
   const [copiedIn, setCopiedIn] = useState(false);
   const [copiedOut, setCopiedOut] = useState(false);
 
-  const baseUrl = process.env.NEXT_PUBLIC_NEXTAUTH_URL || "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const checkInUrl = property.checkInToken
     ? `${baseUrl}/checkin/${property.checkInToken}`
     : null;
   const checkOutUrl = property.checkOutToken
     ? `${baseUrl}/checkout/${property.checkOutToken}`
     : null;
+
+  const displayBaseUrl = baseUrl.replace(/^https?:\/\//, '');
 
   const copyToClipboard = async (text: string, setCopied: (v: boolean) => void) => {
     await navigator.clipboard.writeText(text);
@@ -62,7 +64,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-gray-500 mb-1">Check-in Link</p>
                 <p className="text-sm text-gray-600 font-mono truncate">
-                  {checkInUrl.replace(baseUrl, 'signedstay.com')}
+                  {checkInUrl.replace(baseUrl, displayBaseUrl)}
                 </p>
               </div>
               <div className="flex items-center gap-1">
@@ -90,7 +92,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-gray-500 mb-1">Check-out Link</p>
                 <p className="text-sm text-gray-600 font-mono truncate">
-                  {checkOutUrl.replace(baseUrl, 'signedstay.com')}
+                  {checkOutUrl.replace(baseUrl, displayBaseUrl)}
                 </p>
               </div>
               <div className="flex items-center gap-1">

@@ -60,7 +60,7 @@ export default function CheckOutPage() {
       return;
     }
 
-    if (!formData.depositReturned && !formData.incidentDescription) {
+    if (formData.depositReturned === false && !formData.incidentDescription) {
       setError("Please describe the issue with the deposit.");
       return;
     }

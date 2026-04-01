@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -47,6 +48,8 @@ export async function POST(request: Request) {
         depositAmount: depositAmount || 600,
       },
     });
+
+    revalidatePath("/admin/properties");
 
     return NextResponse.json(property);
   } catch (error) {

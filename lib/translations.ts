@@ -9,7 +9,7 @@ export const translations = {
     },
     hero: {
       badge: "✦ Pouzdano rješenje za iznajmljivače diljem Europe",
-      headline: "Digitalna Check-In i Check-Out potvrda za vaše nekretnine",
+      headline: "Digitalna Check-In i Check-Out potvrda za vaše objekte za iznajmljivanje",
       cta_primary: "Započnite s korištenjem",
       cta_secondary: "Pogledajte kako funkcionira",
       below_cta: "30€/godišnje po objektu · Bez naknada za postavljanje · Otkazivanje u bilo trenutku",
