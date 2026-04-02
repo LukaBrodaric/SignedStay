@@ -16,12 +16,12 @@ function formatDate(date: string | Date): string {
 function loadAttachments(documents: { filePath: string; displayName: string }[]) {
   return documents
     .filter(doc => {
-      const fullPath = path.join(process.cwd(), doc.filePath);
+      const fullPath = path.join(process.cwd(), "public", doc.filePath);
       return fs.existsSync(fullPath);
     })
     .map(doc => ({
       filename: doc.displayName,
-      content: fs.readFileSync(path.join(process.cwd(), doc.filePath)),
+      content: fs.readFileSync(path.join(process.cwd(), "public", doc.filePath)),
     }));
 }
 
