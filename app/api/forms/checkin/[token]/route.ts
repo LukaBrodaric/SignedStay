@@ -78,6 +78,8 @@ export async function POST(
     });
 
     try {
+      console.log("Property documents:", JSON.stringify(property.documents));
+      
       await sendCheckinGuestEmail({
         to: guestEmail,
         guestName,
@@ -89,7 +91,7 @@ export async function POST(
         numberOfGuests: parseInt(numberOfGuests),
         depositConfirmed,
         conditionConfirmed,
-        documents: property.documents.map(d => ({ filePath: d.filePath, displayName: d.name, mimeType: d.mimeType })),
+        documents: property.documents.map(d => ({ filePath: d.filePath, displayName: d.fileName, mimeType: d.mimeType })),
       });
 
       await sendCheckinOwnerEmail({

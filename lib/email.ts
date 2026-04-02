@@ -14,15 +14,28 @@ function formatDate(date: string | Date): string {
 }
 
 function loadAttachments(documents: { filePath: string; displayName: string; mimeType?: string }[]) {
-  return documents
-    .filter(doc => {
-      const fullPath = path.join(process.cwd(), "public", doc.filePath);
-      return fs.existsSync(fullPath);
-    })
-    .map(doc => ({
-      filename: doc.displayName,
-      content: fs.readFileSync(path.join(process.cwd(), "public", doc.filePath)).toString("base64"),
-    }));
+  const attachments = [];
+  
+  for (const doc of documents) {
+    // Fix path - ensure no double slashes
+    const normalizedPath = doc.filePath.startsWith("/") ? doc.filePath.slice(1) : doc.filePath;
+    const fullPath = path.join(process.cwd(), "public", normalizedPath);
+    
+    console.log("Looking for document at:", fullPath);
+    console.log("File exists:", fs.existsSync(fullPath));
+    
+    if (fs.existsSync(fullPath)) {
+      const fileBuffer = fs.readFileSync(fullPath);
+      console.log("File size:", fileBuffer.length, "bytes");
+      
+      attachments.push({
+        filename: doc.displayName,
+        content: Buffer.from(fileBuffer).toString("base64"),
+      });
+    }
+  }
+  
+  return attachments;
 }
 
 const baseEmailTemplate = (content: string) => `

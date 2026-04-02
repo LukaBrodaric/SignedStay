@@ -44,6 +44,18 @@ export async function POST(
       return NextResponse.json({ error: "Document name required" }, { status: 400 });
     }
 
+    // Only allow PDF files
+    if (file.type !== "application/pdf") {
+      return NextResponse.json(
+        { error: "Only PDF files are allowed" },
+        { status: 400 }
+      );
+    }
+
+    const ext = "pdf"; // Always use .pdf
+    const originalName = file.name.replace(/\.[^/.]+$/, ""); // Remove extension for display
+    const fileNameForDb = `${originalName.replace(/[^a-zA-Z0-9]/g, "-")}-${Date.now()}.${ext}`;
+
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
         { error: `File too large. Max ${MAX_FILE_SIZE / 1024 / 1024}MB` },
@@ -57,9 +69,7 @@ export async function POST(
     const uploadDir = join(process.cwd(), "public", "uploads", "documents", propertyId);
     await mkdir(uploadDir, { recursive: true });
 
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const ext = file.name.split(".").pop() || "pdf";
-    const fileName = `${uniqueSuffix}.${ext}`;
+    const fileName = fileNameForDb;
     const filePath = join(uploadDir, fileName);
 
     await writeFile(filePath, buffer);
@@ -68,7 +78,7 @@ export async function POST(
       data: {
         propertyId,
         name,
-        fileName: file.name,
+        fileName: fileName,
         filePath: `/uploads/documents/${propertyId}/${fileName}`,
         fileSize: file.size,
         mimeType: file.type,
