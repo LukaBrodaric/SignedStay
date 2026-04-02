@@ -72,6 +72,7 @@ model CheckOut {
   propertyId          String
   property            Property  @relation(fields: [propertyId], references: [id])
   guestName           String
+  guestEmail         String?
   depositReturned     Boolean   @default(false)
   incidentDescription String?
   signatureDataUrl    String?   @db.Text

@@ -22,7 +22,7 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { guestName, depositReturned, incidentDescription, signatureDataUrl } = body;
+    const { guestName, guestEmail, depositReturned, incidentDescription, signatureDataUrl } = body;
 
     if (guestName === undefined || depositReturned === undefined) {
       return NextResponse.json(
@@ -42,6 +42,7 @@ export async function POST(
       data: {
         propertyId: property.id,
         guestName,
+        guestEmail: guestEmail || null,
         depositReturned,
         incidentDescription: incidentDescription || null,
         signatureDataUrl,
@@ -59,10 +60,12 @@ export async function POST(
       year: "numeric",
     });
 
+    const emailToSend = guestEmail || lastCheckIn?.guestEmail;
+
     try {
-      if (lastCheckIn) {
+      if (emailToSend) {
         await sendCheckoutGuestEmail({
-          to: lastCheckIn.guestEmail,
+          to: emailToSend,
           guestName,
           propertyName: property.name,
           depositReturned,

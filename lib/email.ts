@@ -1,4 +1,6 @@
 import { Resend } from "resend";
+import path from "path";
+import fs from "fs";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.EMAIL_FROM || "SignedStay <info@signedstay.com>";
@@ -9,6 +11,18 @@ function formatDate(date: string | Date): string {
     month: "long",
     year: "numeric",
   });
+}
+
+function loadAttachments(documents: { filePath: string; displayName: string }[]) {
+  return documents
+    .filter(doc => {
+      const fullPath = path.join(process.cwd(), doc.filePath);
+      return fs.existsSync(fullPath);
+    })
+    .map(doc => ({
+      filename: doc.displayName,
+      content: fs.readFileSync(path.join(process.cwd(), doc.filePath)),
+    }));
 }
 
 const baseEmailTemplate = (content: string) => `
@@ -141,6 +155,7 @@ export async function sendCheckinGuestEmail(params: {
 }) {
   try {
     const hasDocuments = params.documents.length > 0;
+    const attachments = hasDocuments ? loadAttachments(params.documents) : [];
     const html = baseEmailTemplate(`
       <h1 style="margin: 0 0 8px; font-size: 24px; font-weight: 700; color: #0f172a; line-height: 1.3;">Check-In Confirmed ✅</h1>
       <p style="margin: 0 0 24px; font-size: 16px; color: #475569; line-height: 1.6;">Thank you, ${params.guestName}! Your check-in has been successfully recorded.</p>
@@ -163,6 +178,7 @@ export async function sendCheckinGuestEmail(params: {
       from: FROM, to: params.to,
       subject: `Check-In Confirmed — ${params.propertyName}`,
       html,
+      attachments: attachments.length > 0 ? attachments : undefined,
     });
   } catch (e) { console.error("sendCheckinGuestEmail failed:", e); }
 }

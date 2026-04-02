@@ -28,6 +28,7 @@ export default function CheckOutPage() {
 
   const [formData, setFormData] = useState({
     guestName: "",
+    guestEmail: "",
     depositReturned: false,
     incidentDescription: "",
     signatureDataUrl: "",
@@ -194,6 +195,20 @@ export default function CheckOutPage() {
                     setFormData({ ...formData, guestName: e.target.value })
                   }
                   required
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Email Address <span className="text-gray-400">(optional)</span>
+                </label>
+                <Input
+                  type="email"
+                  placeholder="john@example.com"
+                  value={formData.guestEmail}
+                  onChange={(e) =>
+                    setFormData({ ...formData, guestEmail: e.target.value })
+                  }
                 />
               </div>
 
