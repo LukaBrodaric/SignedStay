@@ -298,29 +298,33 @@ export async function sendContactEmail(params: {
 }) {
   const ADMIN_EMAIL = "info@signedstay.com";
   
-  try {
-    const html = baseEmailTemplate(`
-      <h1 style="margin: 0 0 8px; font-size: 24px; font-weight: 700; color: #0f172a; line-height: 1.3;">Nova poruka s kontaktnog obrasca 📬</h1>
-      <p style="margin: 0 0 24px; font-size: 16px; color: #475569; line-height: 1.6;">Netko vam je poslao poruku putem kontaktnog obrasca na web stranici.</p>
-      ${infoBox(`
-        ${infoRow('Ime', params.name)}
-        ${infoRow('Email', params.email)}
-        ${infoRow('Naslov', params.subject)}
-      `)}
-      <div style="background-color: #f8f7ff; border-radius: 12px; padding: 20px 24px; margin: 20px 0; border: 1px solid #ede9fe;">
-        <p style="margin: 0 0 8px; font-size: 13px; color: #94a3b8;">Poruka:</p>
-        <p style="margin: 0; font-size: 15px; color: #0f172a; line-height: 1.6; white-space: pre-wrap;">${params.message}</p>
-      </div>
-      <p style="margin: 24px 0 0; font-size: 14px; color: #64748b;">
-        Odgovorite na ovu poruku slanjem emaila na: <a href="mailto:${params.email}" style="color: #6366f1;">${params.email}</a>
-      </p>
-    `);
-    return await resend.emails.send({
-      from: FROM,
-      to: ADMIN_EMAIL,
-      replyTo: params.email,
-      subject: `[Kontakt] ${params.subject}`,
-      html,
-    });
-  } catch (e) { console.error("sendContactEmail failed:", e); }
+  const html = baseEmailTemplate(`
+    <h1 style="margin: 0 0 8px; font-size: 24px; font-weight: 700; color: #0f172a; line-height: 1.3;">Nova poruka s kontaktnog obrasca 📬</h1>
+    <p style="margin: 0 0 24px; font-size: 16px; color: #475569; line-height: 1.6;">Netko vam je poslao poruku putem kontaktnog obrasca na web stranici.</p>
+    ${infoBox(`
+      ${infoRow('Ime', params.name)}
+      ${infoRow('Email', `<a href="mailto:${params.email}" style="color: #6366f1;">${params.email}</a>`)}
+      ${infoRow('Naslov', params.subject)}
+    `)}
+    <div style="background-color: #f8f7ff; border-radius: 12px; padding: 20px 24px; margin: 20px 0; border: 1px solid #ede9fe;">
+      <p style="margin: 0 0 8px; font-size: 13px; color: #94a3b8;">Poruka:</p>
+      <p style="margin: 0; font-size: 15px; color: #0f172a; line-height: 1.6; white-space: pre-wrap;">${params.message}</p>
+    </div>
+    <p style="margin: 24px 0 0; font-size: 14px; color: #64748b;">
+      Odgovorite na ovu poruku slanjem emaila na: <a href="mailto:${params.email}" style="color: #6366f1;">${params.email}</a>
+    </p>
+  `);
+
+  const result = await resend.emails.send({
+    from: FROM,
+    to: ADMIN_EMAIL,
+    subject: `[Kontakt] ${params.subject}`,
+    html,
+  });
+
+  if (result.error) {
+    throw new Error(`Resend error: ${result.error.message}`);
+  }
+
+  return result;
 }
