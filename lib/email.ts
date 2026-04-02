@@ -13,7 +13,7 @@ function formatDate(date: string | Date): string {
   });
 }
 
-function loadAttachments(documents: { filePath: string; displayName: string }[]) {
+function loadAttachments(documents: { filePath: string; displayName: string; mimeType?: string }[]) {
   return documents
     .filter(doc => {
       const fullPath = path.join(process.cwd(), "public", doc.filePath);
@@ -21,7 +21,7 @@ function loadAttachments(documents: { filePath: string; displayName: string }[])
     })
     .map(doc => ({
       filename: doc.displayName,
-      content: fs.readFileSync(path.join(process.cwd(), "public", doc.filePath)),
+      content: fs.readFileSync(path.join(process.cwd(), "public", doc.filePath)).toString("base64"),
     }));
 }
 

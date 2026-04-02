@@ -89,7 +89,7 @@ export async function POST(
         numberOfGuests: parseInt(numberOfGuests),
         depositConfirmed,
         conditionConfirmed,
-        documents: property.documents.map(d => ({ filePath: d.filePath, displayName: d.name })),
+        documents: property.documents.map(d => ({ filePath: d.filePath, displayName: d.name, mimeType: d.mimeType })),
       });
 
       await sendCheckinOwnerEmail({
