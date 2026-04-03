@@ -27,20 +27,30 @@ export function Contact() {
     setError("");
 
     try {
+      console.log("Submitting contact form:", formData);
+      
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
+      console.log("Response status:", res.status);
+      const text = await res.text();
+      console.log("Response text:", text);
+
       if (!res.ok) {
-        const data = await res.json();
+        const data = JSON.parse(text);
         throw new Error(data.error || "Failed to send message");
       }
+
+      const data = JSON.parse(text);
+      console.log("Success:", data);
 
       setSent(true);
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (err) {
+      console.error("Contact form error:", err);
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
