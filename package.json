@@ -14,11 +14,13 @@
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.27",
     "bcryptjs": "^3.0.3",
+    "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",

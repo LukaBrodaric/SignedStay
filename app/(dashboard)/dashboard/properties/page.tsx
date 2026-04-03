@@ -49,7 +49,7 @@ export default function ClientPropertiesPage() {
         subtitle="Manage your properties and share check-in links with guests"
         user={{ name: session?.user?.name, email: session?.user?.email }}
       />
-      <div className="max-w-7xl mx-auto px-8 py-8">
+      <div className="max-w-7xl mx-auto pt-6">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-gray-500">Loading...</div>

@@ -1,635 +1,376 @@
-# SignedStay — Email System with Resend
+# SignedStay — UI Improvements & New Pages
 
-Implement a complete email system using **Resend** for all transactional emails. Read all existing code carefully before making changes, especially the existing `lib/email.ts`, check-in/check-out API routes, and the `PropertyDocument` model in Prisma.
-
----
-
-## Install Resend
-
-```bash
-npm install resend
-```
+Please make the following changes to the existing application. Read all existing code carefully before making changes. Do not break any existing functionality.
 
 ---
 
-## Environment Variables
+## Change 1: Check-In Form — Extended Departure Hour Options
 
-Add to `.env`:
-```env
-RESEND_API_KEY="re_xxxxxxxxxxxx"
-EMAIL_FROM="SignedStay <info@signedstay.com>"
+Find the check-in form (`app/checkin/[token]/page.tsx` or `components/forms/CheckInForm.tsx`) and update the estimated departure hour select options to include every hour from midnight to 15:00:
+
 ```
+00:00 (Midnight)
+01:00
+02:00
+03:00
+04:00
+05:00
+06:00
+07:00
+08:00
+09:00
+10:00
+11:00
+12:00 (Noon)
+13:00
+14:00
+15:00
+```
+
+Replace the existing limited options with this full list. Keep the same select styling.
 
 ---
 
-## File Structure
+## Change 2: Privacy Policy & Terms of Service Pages
 
-Create the following files:
+Create two new public pages with full content in both Croatian and English, switchable via the same HR/EN language system already in place (`useLanguage` hook + `translations`).
 
-```
-lib/
-  email.ts                          # Main email sending functions (replace existing)
-emails/
-  layouts/
-    base.tsx                        # Base layout component (logo, footer)
-  templates/
-    welcome-user.tsx                # Admin created new user
-    new-property.tsx                # Admin created new property for user
-    checkin-guest.tsx               # Check-in confirmation for guest
-    checkin-owner.tsx               # Check-in notification for property owner
-    checkout-guest.tsx              # Check-out confirmation for guest
-    checkout-owner.tsx              # Check-out notification for property owner
-```
+### Routes
+- `app/privacy/page.tsx` — Privacy Policy
+- `app/terms/page.tsx` — Terms of Service
+
+### Page design
+Both pages should follow this layout:
+- Same navbar as landing page (with language switcher)
+- Max width container: `max-w-4xl mx-auto px-6 py-16`
+- Page title: `text-4xl font-bold text-slate-900 mb-2`
+- Last updated date below title: `text-slate-400 text-sm mb-12`
+- Section headings: `text-xl font-semibold text-slate-900 mt-10 mb-3`
+- Body text: `text-slate-600 leading-relaxed`
+- Same footer as landing page
+- Wrap with `LanguageProvider`
 
 ---
 
-## Base Layout (`emails/layouts/base.tsx`)
+### Privacy Policy Content
 
-Create a clean, professional HTML email base layout. This is a React component using standard HTML elements (compatible with email clients):
+Add to `translations.ts` under `privacy` key for both `hr` and `en`:
 
-```tsx
-import { ReactNode } from "react";
+**Croatian (hr):**
 
-interface BaseLayoutProps {
-  previewText?: string;
-  children: ReactNode;
-}
+```
+title: "Pravila privatnosti"
+lastUpdated: "Zadnje ažuriranje: travanj 2025."
 
-export default function BaseLayout({ previewText, children }: BaseLayoutProps) {
-  return (
-    <html>
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        {previewText && (
-          <div style={{ display: "none", maxHeight: 0, overflow: "hidden" }}>
-            {previewText}
-          </div>
-        )}
-      </head>
-      <body style={{
-        margin: 0,
-        padding: 0,
-        backgroundColor: "#f8f7ff",
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      }}>
-        <table width="100%" cellPadding={0} cellSpacing={0} style={{ backgroundColor: "#f8f7ff", padding: "40px 20px" }}>
-          <tr>
-            <td align="center">
-              <table width="600" cellPadding={0} cellSpacing={0} style={{ maxWidth: "600px", width: "100%" }}>
-
-                {/* Header */}
-                <tr>
-                  <td style={{
-                    backgroundColor: "#ffffff",
-                    borderRadius: "16px 16px 0 0",
-                    padding: "32px 40px 24px",
-                    borderBottom: "1px solid #f0eeff",
-                  }}>
-                    <div style={{ display: "inline-block" }}>
-                      <div style={{
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "10px",
-                        background: "linear-gradient(135deg, #6366f1, #3b82f6)",
-                        display: "inline-block",
-                        verticalAlign: "middle",
-                      }} />
-                      <span style={{
-                        fontSize: "20px",
-                        fontWeight: "700",
-                        color: "#0f172a",
-                        verticalAlign: "middle",
-                        marginLeft: "10px",
-                      }}>
-                        SignedStay
-                      </span>
-                    </div>
-                  </td>
-                </tr>
-
-                {/* Content */}
-                <tr>
-                  <td style={{ backgroundColor: "#ffffff", padding: "32px 40px" }}>
-                    {children}
-                  </td>
-                </tr>
-
-                {/* Footer */}
-                <tr>
-                  <td style={{
-                    backgroundColor: "#ffffff",
-                    borderRadius: "0 0 16px 16px",
-                    padding: "24px 40px 32px",
-                    borderTop: "1px solid #f0eeff",
-                    textAlign: "center",
-                  }}>
-                    <p style={{ margin: 0, fontSize: "13px", color: "#94a3b8" }}>
-                      © {new Date().getFullYear()} SignedStay · signedstay.com
-                    </p>
-                    <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#cbd5e1" }}>
-                      This is an automated message. Please do not reply to this email.
-                    </p>
-                  </td>
-                </tr>
-
-              </table>
-            </td>
-          </tr>
-        </table>
-      </body>
-    </html>
-  );
-}
+sections: [
+  {
+    heading: "1. Uvod",
+    content: "SignedStay ('mi', 'nas', 'naš') poštuje vašu privatnost i obvezuje se zaštititi osobne podatke koje nam povjerite. Ova Pravila privatnosti objašnjavaju kako prikupljamo, koristimo i štitimo vaše podatke kada koristite našu platformu na signedstay.com."
+  },
+  {
+    heading: "2. Koje podatke prikupljamo",
+    content: "Prikupljamo sljedeće vrste podataka:\n\n• Podaci o vlasnicima objekata: ime, prezime, email adresa, podaci o nekretninama.\n• Podaci o gostima: ime i prezime, email adresa, datum dolaska i odlaska, broj gostiju, digitalni potpis, potvrda depozita i stanja objekta.\n• Tehnički podaci: IP adresa, vrsta preglednika, podaci o uređaju, kolačići."
+  },
+  {
+    heading: "3. Kako koristimo vaše podatke",
+    content: "Vaše podatke koristimo isključivo za:\n\n• Pružanje usluge digitalnog check-in i check-out procesa.\n• Slanje automatskih email potvrda gostima i vlasnicima objekata.\n• Čuvanje evidencije o boravcima u svrhu zaštite vlasnika i gostiju.\n• Poboljšanje naše usluge i korisničkog iskustva."
+  },
+  {
+    heading: "4. Dijeljenje podataka",
+    content: "Vaše osobne podatke ne prodajemo, ne iznajmljujemo niti dijelimo s trećim stranama u komercijalne svrhe. Podaci se dijele isključivo:\n\n• Između vlasnika objekta i njegovih gostiju u okviru platforme.\n• S pružateljima tehničkih usluga neophodnih za rad platforme (hosting, email servisi), koji su obvezani ugovorima o zaštiti podataka."
+  },
+  {
+    heading: "5. Čuvanje podataka",
+    content: "Podatke čuvamo onoliko dugo koliko je potrebno za pružanje usluge i ispunjavanje zakonskih obveza. Vlasnici objekata mogu zatražiti brisanje podataka kontaktiranjem na info@signedstay.com. Podaci gostiju čuvaju se u skladu s potrebama vlasnika objekta i primjenjivim zakonima."
+  },
+  {
+    heading: "6. Vaša prava (GDPR)",
+    content: "Ako ste rezident Europskog gospodarskog prostora, imate pravo:\n\n• Pristupiti svojim osobnim podacima.\n• Ispraviti netočne podatke.\n• Zatražiti brisanje podataka ('pravo na zaborav').\n• Ograničiti obradu podataka.\n• Prigovoriti obradi podataka.\n• Prenosivosti podataka.\n\nZa ostvarivanje ovih prava kontaktirajte nas na info@signedstay.com."
+  },
+  {
+    heading: "7. Kolačići",
+    content: "Koristimo isključivo funkcionalne kolačiće neophodne za rad platforme (npr. autentifikacija, jezične postavke). Ne koristimo kolačiće za praćenje ili reklamne svrhe."
+  },
+  {
+    heading: "8. Sigurnost podataka",
+    content: "Primjenjujemo odgovarajuće tehničke i organizacijske mjere zaštite podataka, uključujući enkripciju prijenosa podataka (HTTPS/SSL), hashiranje lozinki i kontrolu pristupa. Međutim, nijedan sustav nije 100% siguran i ne možemo jamčiti apsolutnu sigurnost."
+  },
+  {
+    heading: "9. Kontakt",
+    content: "Za sva pitanja vezana uz privatnost i zaštitu podataka možete nas kontaktirati:\n\nSignedStay\nEmail: info@signedstay.com\nTelefon: +385 91 915 7424\nAdresa: Pula, Hrvatska"
+  }
+]
 ```
 
-### Reusable helper components — add to `emails/layouts/components.tsx`:
+**English (en):**
 
-```tsx
-import { ReactNode } from "react";
+```
+title: "Privacy Policy"
+lastUpdated: "Last updated: April 2025"
 
-export function EmailHeading({ children }: { children: ReactNode }) {
-  return (
-    <h1 style={{ margin: "0 0 8px", fontSize: "24px", fontWeight: "700", color: "#0f172a", lineHeight: "1.3" }}>
-      {children}
-    </h1>
-  );
-}
-
-export function EmailSubtext({ children }: { children: ReactNode }) {
-  return (
-    <p style={{ margin: "0 0 24px", fontSize: "16px", color: "#475569", lineHeight: "1.6" }}>
-      {children}
-    </p>
-  );
-}
-
-export function EmailInfoBox({ children }: { children: ReactNode }) {
-  return (
-    <div style={{ backgroundColor: "#f8f7ff", borderRadius: "12px", padding: "20px 24px", margin: "20px 0", border: "1px solid #ede9fe" }}>
-      {children}
-    </div>
-  );
-}
-
-export function EmailInfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <table width="100%" cellPadding={0} cellSpacing={0} style={{ marginBottom: "8px" }}>
-      <tr>
-        <td style={{ fontSize: "13px", color: "#94a3b8", width: "45%" }}>{label}</td>
-        <td style={{ fontSize: "14px", color: "#0f172a", fontWeight: "600" }}>{value}</td>
-      </tr>
-    </table>
-  );
-}
-
-export function EmailConfirmBadge({ confirmed, text }: { confirmed: boolean; text: string }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", margin: "8px 0", fontSize: "14px", color: confirmed ? "#16a34a" : "#dc2626" }}>
-      {confirmed ? "✓" : "✗"} {text}
-    </div>
-  );
-}
-
-export function EmailButton({ href, children }: { href: string; children: ReactNode }) {
-  return (
-    <a href={href} style={{ display: "inline-block", backgroundColor: "#6366f1", color: "#ffffff", padding: "12px 28px", borderRadius: "10px", fontSize: "15px", fontWeight: "600", textDecoration: "none", margin: "16px 0" }}>
-      {children}
-    </a>
-  );
-}
-
-export function EmailDivider() {
-  return <hr style={{ border: "none", borderTop: "1px solid #f1f5f9", margin: "24px 0" }} />;
-}
-
-export function EmailAlert({ children }: { children: ReactNode }) {
-  return (
-    <div style={{ backgroundColor: "#fffbeb", border: "1px solid #fde68a", borderRadius: "10px", padding: "14px 18px", margin: "16px 0", fontSize: "14px", color: "#92400e" }}>
-      ⚠️ {children}
-    </div>
-  );
-}
+sections: [
+  {
+    heading: "1. Introduction",
+    content: "SignedStay ('we', 'us', 'our') respects your privacy and is committed to protecting the personal data you entrust to us. This Privacy Policy explains how we collect, use, and protect your data when you use our platform at signedstay.com."
+  },
+  {
+    heading: "2. Data We Collect",
+    content: "We collect the following types of data:\n\n• Property owner data: name, surname, email address, property information.\n• Guest data: full name, email address, arrival and departure dates, number of guests, digital signature, deposit and property condition confirmation.\n• Technical data: IP address, browser type, device information, cookies."
+  },
+  {
+    heading: "3. How We Use Your Data",
+    content: "We use your data solely for:\n\n• Providing the digital check-in and check-out service.\n• Sending automated email confirmations to guests and property owners.\n• Maintaining stay records to protect both owners and guests.\n• Improving our service and user experience."
+  },
+  {
+    heading: "4. Data Sharing",
+    content: "We do not sell, rent, or share your personal data with third parties for commercial purposes. Data is shared only:\n\n• Between property owners and their guests within the platform.\n• With technical service providers necessary for platform operation (hosting, email services), who are bound by data protection agreements."
+  },
+  {
+    heading: "5. Data Retention",
+    content: "We retain data for as long as necessary to provide the service and fulfill legal obligations. Property owners may request data deletion by contacting info@signedstay.com. Guest data is retained in accordance with property owner needs and applicable laws."
+  },
+  {
+    heading: "6. Your Rights (GDPR)",
+    content: "If you are a resident of the European Economic Area, you have the right to:\n\n• Access your personal data.\n• Correct inaccurate data.\n• Request data deletion ('right to be forgotten').\n• Restrict data processing.\n• Object to data processing.\n• Data portability.\n\nTo exercise these rights, contact us at info@signedstay.com."
+  },
+  {
+    heading: "7. Cookies",
+    content: "We use only functional cookies necessary for platform operation (e.g., authentication, language settings). We do not use tracking or advertising cookies."
+  },
+  {
+    heading: "8. Data Security",
+    content: "We implement appropriate technical and organizational data protection measures, including data transmission encryption (HTTPS/SSL), password hashing, and access control. However, no system is 100% secure and we cannot guarantee absolute security."
+  },
+  {
+    heading: "9. Contact",
+    content: "For all privacy and data protection inquiries:\n\nSignedStay\nEmail: info@signedstay.com\nPhone: +385 91 915 7424\nAddress: Pula, Croatia"
+  }
+]
 ```
 
 ---
 
-## Email Templates
+### Terms of Service Content
 
-### 1. `emails/templates/welcome-user.tsx`
-Sent when: Admin creates a new user account.
-Recipient: New CLIENT user.
+Add to `translations.ts` under `terms` key for both `hr` and `en`:
 
-```tsx
-interface WelcomeUserEmailProps {
-  userName: string;
-  email: string;
-  temporaryPassword: string;
-}
+**Croatian (hr):**
+
+```
+title: "Uvjeti korištenja"
+lastUpdated: "Zadnje ažuriranje: travanj 2025."
+
+sections: [
+  {
+    heading: "1. Prihvaćanje uvjeta",
+    content: "Korištenjem platforme SignedStay pristajete na ove Uvjete korištenja. Ako se ne slažete s ovim uvjetima, molimo vas da ne koristite našu uslugu."
+  },
+  {
+    heading: "2. Opis usluge",
+    content: "SignedStay je platforma za digitalno upravljanje check-in i check-out procesima za iznajmljivače nekretnina. Usluga omogućuje:\n\n• Generiranje jedinstvenih linkova za check-in i check-out.\n• Digitalno prikupljanje podataka gostiju i potpisa.\n• Automatsko slanje email potvrda.\n• Čuvanje evidencije boravaka u digitalnom obliku."
+  },
+  {
+    heading: "3. Registracija i računi",
+    content: "Registracija na platformi je moguća isključivo uz odobrenje administratora SignedStay. Odgovorni ste za čuvanje povjerljivosti svojih podataka za prijavu i za sve aktivnosti koje se odvijaju putem vašeg računa. Obavezni ste odmah obavijestiti SignedStay o svakoj neovlaštenoj upotrebi vašeg računa."
+  },
+  {
+    heading: "4. Pretplata i plaćanje",
+    content: "Usluga se naplaćuje godišnjom pretplatom od 30 EUR po objektu. Plaćanje se vrši temeljem issued računa. Pristup platformi aktivira se nakon potvrde uplate. Povrat novca nije moguć nakon aktivacije računa, osim u slučajevima predviđenim zakonom."
+  },
+  {
+    heading: "5. Odgovornost korisnika",
+    content: "Kao korisnik platforme obvezujete se:\n\n• Koristiti platformu isključivo u zakonite svrhe.\n• Ne unositi lažne ili obmanjujuće podatke.\n• Čuvati povjerljivost linkova za check-in i check-out.\n• Osigurati da gosti budu obaviješteni o prikupljanju njihovih podataka.\n• Poštovati primjenjive zakone o zaštiti podataka (GDPR)."
+  },
+  {
+    heading: "6. Odricanje od odgovornosti",
+    content: "SignedStay nije odgovoran za:\n\n• Sporove između vlasnika objekata i gostiju.\n• Gubitak podataka uzrokovan tehničkim poteškoćama izvan naše kontrole.\n• Štete nastale neovlaštenim pristupom podacima ukoliko je korisnik propustio zaštititi svoje pristupne podatke.\n• Posljedice korištenja platforme u svrhe koje nisu predviđene ovim Uvjetima."
+  },
+  {
+    heading: "7. Dostupnost usluge",
+    content: "Nastojimo osigurati neprekidnu dostupnost platforme, ali ne garantiramo 100% uptime. Zadržavamo pravo privremeno isključiti platformu radi održavanja ili nadogradnje, uz prethodnu obavijest korisnicima kada je to moguće."
+  },
+  {
+    heading: "8. Izmjene uvjeta",
+    content: "SignedStay zadržava pravo izmjene ovih Uvjeta korištenja u bilo kojem trenutku. O značajnim izmjenama obavijestit ćemo korisnike putem email adrese registrirane na platformi. Nastavak korištenja platforme nakon izmjena predstavlja prihvaćanje novih uvjeta."
+  },
+  {
+    heading: "9. Mjerodavno pravo",
+    content: "Na ove Uvjete korištenja primjenjuje se pravo Republike Hrvatske. Sve sporove nastojat ćemo riješiti sporazumno, a u slučaju spora nadležan je sud u Puli, Hrvatska."
+  },
+  {
+    heading: "10. Kontakt",
+    content: "Za sva pitanja vezana uz Uvjete korištenja:\n\nSignedStay\nEmail: info@signedstay.com\nTelefon: +385 91 915 7424\nAdresa: Pula, Hrvatska"
+  }
+]
 ```
 
-Content:
-- Heading: "Welcome to SignedStay! 👋"
-- Subtext: "Your account has been created by the administrator. Here are your login credentials:"
-- InfoBox: Email, Password
-- EmailButton href="https://signedstay.com/login" → "Log In to Your Account"
-- EmailAlert: "Please change your password after your first login."
-- Closing: "If you have any questions, contact us at info@signedstay.com"
+**English (en):**
 
----
-
-### 2. `emails/templates/new-property.tsx`
-Sent when: Admin creates a new property for a user.
-Recipient: Property owner (CLIENT).
-
-```tsx
-interface NewPropertyEmailProps {
-  userName: string;
-  propertyName: string;
-  propertyType: string;
-  address?: string;
-  depositAmount: number;
-}
 ```
+title: "Terms of Service"
+lastUpdated: "Last updated: April 2025"
 
-Content:
-- Heading: "A new property has been added 🏠"
-- Subtext: "Your property has been set up in SignedStay."
-- InfoBox: Property Name, Type, Address (if set), Deposit Amount (€)
-- Note: "Your check-in and check-out links will be shared with you by the administrator."
-- EmailButton href="https://signedstay.com/dashboard" → "View Your Dashboard"
-
----
-
-### 3. `emails/templates/checkin-guest.tsx`
-Sent when: Guest submits check-in form.
-Recipient: Guest.
-
-```tsx
-interface CheckinGuestEmailProps {
-  guestName: string;
-  propertyName: string;
-  propertyType: string;
-  arrivalDate: string;
-  departureDate: string;
-  estimatedDepartureHour: string;
-  numberOfGuests: number;
-  depositConfirmed: boolean;
-  conditionConfirmed: boolean;
-  hasDocuments: boolean;
-}
-```
-
-Content:
-- Heading: "Check-In Confirmed ✅"
-- Subtext: "Thank you, [guestName]! Your check-in has been successfully recorded."
-- InfoBox: Property Name, Type, Arrival, Departure, Est. Departure Hour, Number of Guests
-- EmailDivider
-- EmailConfirmBadge for depositConfirmed: "Deposit confirmed"
-- EmailConfirmBadge for conditionConfirmed: "Property condition confirmed"
-- EmailConfirmBadge confirmed=true: "Digital signature recorded"
-- If hasDocuments: small note "Please find the attached property documents in this email."
-- Closing: "We hope you enjoy your stay!"
-
----
-
-### 4. `emails/templates/checkin-owner.tsx`
-Sent when: Guest submits check-in form.
-Recipient: Property owner.
-
-```tsx
-interface CheckinOwnerEmailProps {
-  ownerName: string;
-  guestName: string;
-  guestEmail: string;
-  propertyName: string;
-  propertyType: string;
-  arrivalDate: string;
-  departureDate: string;
-  estimatedDepartureHour: string;
-  numberOfGuests: number;
-  depositConfirmed: boolean;
-  conditionConfirmed: boolean;
-}
-```
-
-Content:
-- Heading: "New Check-In Recorded 🔔"
-- Subtext: "A guest has completed check-in for [propertyName]."
-- InfoBox: all fields above
-- EmailDivider
-- EmailConfirmBadge for depositConfirmed
-- EmailConfirmBadge for conditionConfirmed
-- EmailConfirmBadge confirmed=true: "Digital signature collected"
-- Note: "Guest contact: [guestEmail]"
-- If depositConfirmed is false: EmailAlert "Deposit was NOT confirmed by the guest."
-- EmailButton href="https://signedstay.com/dashboard" → "View in Dashboard"
-
----
-
-### 5. `emails/templates/checkout-guest.tsx`
-Sent when: Guest submits check-out form.
-Recipient: Guest.
-
-```tsx
-interface CheckoutGuestEmailProps {
-  guestName: string;
-  propertyName: string;
-  depositReturned: boolean;
-  incidentDescription?: string;
-  checkOutDate: string;
-}
-```
-
-Content:
-- Heading: "Check-Out Confirmed ✅"
-- Subtext: "Thank you, [guestName]! Your check-out has been recorded."
-- InfoBox: Property Name, Check-Out Date, Deposit Returned (Yes/No), Incident (if any, else "None")
-- EmailConfirmBadge confirmed=true: "Digital check-out recorded"
-- Closing: "Thank you for staying with us. We hope to see you again!"
-
----
-
-### 6. `emails/templates/checkout-owner.tsx`
-Sent when: Guest submits check-out form.
-Recipient: Property owner.
-
-```tsx
-interface CheckoutOwnerEmailProps {
-  ownerName: string;
-  guestName: string;
-  propertyName: string;
-  depositReturned: boolean;
-  incidentDescription?: string;
-  checkOutDate: string;
-}
-```
-
-Content:
-- Heading: "Guest Check-Out Recorded 🔔"
-- Subtext: "[guestName] has completed check-out for [propertyName]."
-- InfoBox: Guest Name, Property, Date, Deposit Returned, Incident
-- If depositReturned is false: EmailAlert "Deposit was marked as NOT returned."
-- If incidentDescription exists: EmailAlert with the incident text
-- EmailButton → "View in Dashboard"
-
----
-
-## Main Email Library (`lib/email.ts`)
-
-Replace existing `lib/email.ts` completely:
-
-```typescript
-import { Resend } from "resend";
-import { renderToStaticMarkup } from "react-dom/server";
-import React from "react";
-import path from "path";
-import fs from "fs";
-
-import WelcomeUserEmail from "@/emails/templates/welcome-user";
-import NewPropertyEmail from "@/emails/templates/new-property";
-import CheckinGuestEmail from "@/emails/templates/checkin-guest";
-import CheckinOwnerEmail from "@/emails/templates/checkin-owner";
-import CheckoutGuestEmail from "@/emails/templates/checkout-guest";
-import CheckoutOwnerEmail from "@/emails/templates/checkout-owner";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = process.env.EMAIL_FROM || "SignedStay <info@signedstay.com>";
-
-function render(component: React.ReactElement): string {
-  return "<!DOCTYPE html>" + renderToStaticMarkup(component);
-}
-
-function loadAttachments(documents: { filePath: string; displayName: string }[]) {
-  return documents
-    .filter(doc => fs.existsSync(path.join(process.cwd(), doc.filePath)))
-    .map(doc => ({
-      filename: doc.displayName,
-      content: fs.readFileSync(path.join(process.cwd(), doc.filePath)),
-    }));
-}
-
-export async function sendWelcomeEmail(params: {
-  to: string; userName: string; email: string; temporaryPassword: string;
-}) {
-  try {
-    return await resend.emails.send({
-      from: FROM, to: params.to,
-      subject: "Welcome to SignedStay — Your account is ready",
-      html: render(React.createElement(WelcomeUserEmail, params)),
-    });
-  } catch (e) { console.error("sendWelcomeEmail failed:", e); }
-}
-
-export async function sendNewPropertyEmail(params: {
-  to: string; userName: string; propertyName: string;
-  propertyType: string; address?: string; depositAmount: number;
-}) {
-  try {
-    return await resend.emails.send({
-      from: FROM, to: params.to,
-      subject: `New property added: ${params.propertyName}`,
-      html: render(React.createElement(NewPropertyEmail, params)),
-    });
-  } catch (e) { console.error("sendNewPropertyEmail failed:", e); }
-}
-
-export async function sendCheckinGuestEmail(params: {
-  to: string; guestName: string; propertyName: string; propertyType: string;
-  arrivalDate: string; departureDate: string; estimatedDepartureHour: string;
-  numberOfGuests: number; depositConfirmed: boolean; conditionConfirmed: boolean;
-  documents: { filePath: string; displayName: string }[];
-}) {
-  try {
-    const attachments = loadAttachments(params.documents);
-    return await resend.emails.send({
-      from: FROM, to: params.to,
-      subject: `Check-In Confirmed — ${params.propertyName}`,
-      html: render(React.createElement(CheckinGuestEmail, { ...params, hasDocuments: attachments.length > 0 })),
-      attachments: attachments.length > 0 ? attachments : undefined,
-    });
-  } catch (e) { console.error("sendCheckinGuestEmail failed:", e); }
-}
-
-export async function sendCheckinOwnerEmail(params: {
-  to: string; ownerName: string; guestName: string; guestEmail: string;
-  propertyName: string; propertyType: string; arrivalDate: string;
-  departureDate: string; estimatedDepartureHour: string;
-  numberOfGuests: number; depositConfirmed: boolean; conditionConfirmed: boolean;
-}) {
-  try {
-    return await resend.emails.send({
-      from: FROM, to: params.to,
-      subject: `New Check-In: ${params.guestName} at ${params.propertyName}`,
-      html: render(React.createElement(CheckinOwnerEmail, params)),
-    });
-  } catch (e) { console.error("sendCheckinOwnerEmail failed:", e); }
-}
-
-export async function sendCheckoutGuestEmail(params: {
-  to: string; guestName: string; propertyName: string;
-  depositReturned: boolean; incidentDescription?: string; checkOutDate: string;
-}) {
-  try {
-    return await resend.emails.send({
-      from: FROM, to: params.to,
-      subject: `Check-Out Confirmed — ${params.propertyName}`,
-      html: render(React.createElement(CheckoutGuestEmail, params)),
-    });
-  } catch (e) { console.error("sendCheckoutGuestEmail failed:", e); }
-}
-
-export async function sendCheckoutOwnerEmail(params: {
-  to: string; ownerName: string; guestName: string; propertyName: string;
-  depositReturned: boolean; incidentDescription?: string; checkOutDate: string;
-}) {
-  try {
-    return await resend.emails.send({
-      from: FROM, to: params.to,
-      subject: `Guest Check-Out: ${params.guestName} at ${params.propertyName}`,
-      html: render(React.createElement(CheckoutOwnerEmail, params)),
-    });
-  } catch (e) { console.error("sendCheckoutOwnerEmail failed:", e); }
-}
+sections: [
+  {
+    heading: "1. Acceptance of Terms",
+    content: "By using the SignedStay platform, you agree to these Terms of Service. If you do not agree with these terms, please do not use our service."
+  },
+  {
+    heading: "2. Service Description",
+    content: "SignedStay is a platform for digital check-in and check-out management for property rental owners. The service enables:\n\n• Generating unique check-in and check-out links.\n• Digitally collecting guest data and signatures.\n• Automatically sending email confirmations.\n• Maintaining digital stay records."
+  },
+  {
+    heading: "3. Registration and Accounts",
+    content: "Registration on the platform is only possible with SignedStay administrator approval. You are responsible for maintaining the confidentiality of your login credentials and for all activities conducted through your account. You must immediately notify SignedStay of any unauthorized use of your account."
+  },
+  {
+    heading: "4. Subscription and Payment",
+    content: "The service is charged as an annual subscription of €30 per property. Payment is made based on issued invoices. Platform access is activated upon payment confirmation. Refunds are not available after account activation, except as required by law."
+  },
+  {
+    heading: "5. User Responsibilities",
+    content: "As a platform user, you agree to:\n\n• Use the platform solely for lawful purposes.\n• Not enter false or misleading information.\n• Maintain the confidentiality of check-in and check-out links.\n• Ensure guests are informed about data collection.\n• Comply with applicable data protection laws (GDPR)."
+  },
+  {
+    heading: "6. Limitation of Liability",
+    content: "SignedStay is not liable for:\n\n• Disputes between property owners and guests.\n• Data loss caused by technical difficulties beyond our control.\n• Damages resulting from unauthorized data access if the user failed to protect their credentials.\n• Consequences of using the platform for purposes not covered by these Terms."
+  },
+  {
+    heading: "7. Service Availability",
+    content: "We strive to ensure continuous platform availability but do not guarantee 100% uptime. We reserve the right to temporarily suspend the platform for maintenance or upgrades, with prior notice to users when possible."
+  },
+  {
+    heading: "8. Changes to Terms",
+    content: "SignedStay reserves the right to modify these Terms of Service at any time. Users will be notified of significant changes via the email address registered on the platform. Continued use of the platform after changes constitutes acceptance of the new terms."
+  },
+  {
+    heading: "9. Governing Law",
+    content: "These Terms of Service are governed by the laws of the Republic of Croatia. We will attempt to resolve all disputes amicably, and in case of dispute, the competent court is in Pula, Croatia."
+  },
+  {
+    heading: "10. Contact",
+    content: "For all Terms of Service inquiries:\n\nSignedStay\nEmail: info@signedstay.com\nPhone: +385 91 915 7424\nAddress: Pula, Croatia"
+  }
+]
 ```
 
 ---
 
-## API Route Updates
+## Change 3: Navigation — Add More Links
 
-### Check-In submission route (`app/api/forms/checkin/[token]/route.ts`)
+Update the existing navbar to include links to more landing page sections. The navbar should link to all major sections using smooth scroll (`href="#section-id"`).
 
-After saving CheckIn to DB, fetch property with owner and documents:
+Updated nav links (in order):
+- Funkcionalnosti / Features → `#features`
+- Kako funkcionira / How it works → `#how-it-works`
+- Za koga / Who it's for → `#target`
+- Cijene / Pricing → `#pricing`
+- FAQ → `#faq`
+- Kontakt / Contact → `#contact`
 
-```typescript
-const property = await prisma.property.findUnique({
-  where: { checkInToken: params.token },
-  include: { user: true, documents: true },
-});
-
-// Send to guest
-await sendCheckinGuestEmail({
-  to: body.guestEmail,
-  guestName: body.guestName,
-  propertyName: property.name,
-  propertyType: property.propertyType,
-  arrivalDate: formatDate(body.arrivalDate),
-  departureDate: formatDate(body.departureDate),
-  estimatedDepartureHour: body.estimatedDepartureHour,
-  numberOfGuests: body.numberOfGuests,
-  depositConfirmed: body.depositConfirmed,
-  conditionConfirmed: body.conditionConfirmed,
-  documents: property.documents.map(d => ({ filePath: d.filePath, displayName: d.displayName })),
-});
-
-// Send to owner
-await sendCheckinOwnerEmail({
-  to: property.user.email,
-  ownerName: property.user.name,
-  guestName: body.guestName,
-  guestEmail: body.guestEmail,
-  propertyName: property.name,
-  propertyType: property.propertyType,
-  arrivalDate: formatDate(body.arrivalDate),
-  departureDate: formatDate(body.departureDate),
-  estimatedDepartureHour: body.estimatedDepartureHour,
-  numberOfGuests: body.numberOfGuests,
-  depositConfirmed: body.depositConfirmed,
-  conditionConfirmed: body.conditionConfirmed,
-});
-```
-
-### Check-Out submission route (`app/api/forms/checkout/[token]/route.ts`)
-
-After saving CheckOut to DB:
-
-```typescript
-const property = await prisma.property.findUnique({
-  where: { checkOutToken: params.token },
-  include: { user: true },
-});
-
-// Get last check-in to find guest email
-const lastCheckIn = await prisma.checkIn.findFirst({
-  where: { propertyId: property.id },
-  orderBy: { createdAt: "desc" },
-});
-
-const today = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
-
-// Send to guest if we have their email
-if (lastCheckIn) {
-  await sendCheckoutGuestEmail({
-    to: lastCheckIn.guestEmail,
-    guestName: body.guestName,
-    propertyName: property.name,
-    depositReturned: body.depositReturned,
-    incidentDescription: body.incidentDescription,
-    checkOutDate: today,
-  });
-}
-
-// Send to owner
-await sendCheckoutOwnerEmail({
-  to: property.user.email,
-  ownerName: property.user.name,
-  guestName: body.guestName,
-  propertyName: property.name,
-  depositReturned: body.depositReturned,
-  incidentDescription: body.incidentDescription,
-  checkOutDate: today,
-});
-```
-
-### Admin create user route
-
-After creating user, before returning response:
-```typescript
-await sendWelcomeEmail({
-  to: newUser.email,
-  userName: newUser.name,
-  email: newUser.email,
-  temporaryPassword: plainTextPassword, // save this before hashing
-});
-```
-
-### Admin create property route
-
-After creating property:
-```typescript
-const owner = await prisma.user.findUnique({ where: { id: body.userId } });
-await sendNewPropertyEmail({
-  to: owner.email,
-  userName: owner.name,
-  propertyName: newProperty.name,
-  propertyType: newProperty.propertyType,
-  address: newProperty.address ?? undefined,
-  depositAmount: newProperty.depositAmount,
-});
-```
+Make sure each landing page section has the corresponding `id` attribute set (e.g. `<section id="features">`). Add missing `id` attributes to existing sections if they don't have them.
 
 ---
 
-## Date Helper
+## Change 4: Floating Navbar (SaaS Style)
 
-Add to `lib/utils.ts`:
-```typescript
-export function formatDate(date: string | Date): string {
-  return new Date(date).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-}
-```
+Replace the existing navbar with a modern floating navbar design:
+
+### Design specs
+- **Not full width** — centered with `max-w-5xl mx-auto`
+- **Floating** — fixed at top with margin: `fixed top-4 left-0 right-0 z-50 px-4`
+- **Rounded** — `rounded-2xl` with border
+- **Glassmorphism** — `bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg shadow-black/5`
+- On scroll, increase shadow slightly: add a subtle `shadow-xl` when scrolled (use `useEffect` + `window.scrollY`)
+- Inner padding: `px-6 py-3`
+- Logo on left, nav links in center (hidden on mobile), CTA + language switcher on right
+
+### Mobile
+- Hide nav links on mobile (`hidden md:flex`)
+- Show hamburger menu button on mobile (`md:hidden`) — clicking it toggles a dropdown menu below the navbar showing all links
+- Mobile menu: `absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-100 shadow-xl p-4`
+
+### Logo
+- Small gradient square icon (indigo→blue) + "SignedStay" text in bold
+- Logo links to `/#` (top of page)
+
+### Nav links style
+- `text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors px-3 py-1.5 rounded-lg hover:bg-slate-100`
+- Active section highlight (optional but nice): use `IntersectionObserver` to highlight current section
+
+### CTA Button
+- "Prijava / Login" button — links to `/login`
+- Style: `bg-gradient-to-r from-indigo-600 to-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-xl hover:opacity-90 transition-opacity`
+
+### Important
+- Add `pt-24` to the first section of the landing page (Hero) to account for the fixed floating navbar height
+- The language switcher (HR/EN) stays in the navbar, to the left of the CTA button
 
 ---
 
-## Important Notes
+## Change 5: Bigger & Better Footer
 
-1. All email sends are wrapped in try/catch — email failure must NEVER cause the API to return an error
-2. Email templates use plain React with inline CSS only — no Tailwind, no external CSS
-3. Documents are loaded from filesystem using `filePath` stored in DB (relative to `process.cwd()`)
-4. Remove Nodemailer from the project completely (`npm uninstall nodemailer`) if it was installed
-5. The `emails/` folder is at the project root, not inside `app/`
-6. After making all changes, run `npm run build` to verify no TypeScript errors
+Replace the existing footer with a more complete, multi-column footer.
+
+### Design specs
+- Background: `bg-slate-900`
+- Text: white/slate-400
+- Padding: `py-16 px-6`
+- Max width: `max-w-6xl mx-auto`
+- 4-column grid on desktop, 2-column on tablet, 1-column on mobile: `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10`
+
+### Column 1 — Brand
+- Logo (same as navbar — gradient square + SignedStay text in white)
+- Tagline: "Digitalni check-in i check-out za profesionalne iznajmljivače." / "Digital check-in and check-out for professional rental owners."
+- Social/contact icons row below tagline:
+  - Mail icon linking to `mailto:info@signedstay.com`
+  - Phone icon linking to `tel:+385919157424`
+  - Style: `w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors`
+
+### Column 2 — Navigation (Navigacija / Navigation)
+Links:
+- Funkcionalnosti / Features → `#features`
+- Kako funkcionira / How it works → `#how-it-works`
+- Za koga / Who it's for → `#target`
+- Cijene / Pricing → `#pricing`
+- FAQ → `#faq`
+- Kontakt / Contact → `#contact`
+
+### Column 3 — Legal (Pravno / Legal)
+Links:
+- Pravila privatnosti / Privacy Policy → `/privacy`
+- Uvjeti korištenja / Terms of Service → `/terms`
+- GDPR
+
+### Column 4 — Contact (Kontakt / Contact)
+- Email: info@signedstay.com (clickable)
+- Phone: +385 91 915 7424 (clickable)
+- Address: Pula, Croatia
+- Each item with small icon (Mail, Phone, MapPin) in indigo color
+
+### Bottom bar
+Separator line `border-t border-white/10 mt-12 pt-8`:
+- Left: "© 2025 SignedStay. Sva prava pridržana. / All rights reserved."
+- Right: "Made with ♥ in Pula, Croatia"
+- Flex row, stack on mobile
+
+### Link styles
+`text-slate-400 hover:text-white text-sm transition-colors`
+
+Column headings: `text-white font-semibold text-sm uppercase tracking-wide mb-4`
+
+---
+
+## Final Checklist
+
+- [ ] Check-in form has departure hours from 00:00 to 15:00
+- [ ] Privacy Policy page exists at `/privacy` with full content in HR and EN
+- [ ] Terms of Service page exists at `/terms` with full content in HR and EN
+- [ ] Footer links to `/privacy` and `/terms` work correctly
+- [ ] All landing page sections have correct `id` attributes for smooth scroll
+- [ ] Navbar has all 6 section links
+- [ ] Navbar is floating, rounded, glassmorphism style
+- [ ] Mobile hamburger menu works
+- [ ] Footer is 4-column with brand, nav, legal, contact columns
+- [ ] All new text is in both HR and EN translations
+- [ ] No existing functionality is broken

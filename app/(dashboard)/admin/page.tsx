@@ -88,7 +88,7 @@ export default async function AdminPage() {
         subtitle="Welcome back! Here's an overview of your properties."
         user={{ name: session.user.name, email: session.user.email }}
       />
-      <div className="max-w-7xl mx-auto px-8 py-8">
+      <div className="max-w-7xl mx-auto pt-6">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
           {stats.map((stat) => (
             <Card key={stat.label} className="hover:shadow-md transition-shadow duration-200">

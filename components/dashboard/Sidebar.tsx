@@ -33,7 +33,7 @@ export function Sidebar({ role }: SidebarProps) {
   const links = role === "ADMIN" ? adminLinks : clientLinks;
 
   return (
-    <div className="flex h-screen w-64 flex-col border-r bg-white">
+    <div className="hidden md:flex h-screen w-64 flex-col border-r bg-white">
       <div className="flex h-16 items-center gap-2 border-b px-6">
         <Link href="/" className="flex items-center gap-2">
           <Image

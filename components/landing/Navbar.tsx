@@ -24,13 +24,13 @@ export function Navbar() {
 
   return (
     <nav
-      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+      className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-6xl rounded-2xl transition-all duration-300 ${
         scrolled
-          ? "border-b border-gray-100 bg-white/95 shadow-sm backdrop-blur-md"
-          : "bg-white"
+          ? "bg-white/80 shadow-lg backdrop-blur-xl border border-white/50"
+          : "bg-white/60 backdrop-blur-md border border-white/30 shadow-md"
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+      <div className="mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 group">
           <Image
             src="/signedstaylogo.svg"
@@ -108,7 +108,7 @@ export function Navbar() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="border-t border-gray-100 bg-white px-4 py-4 md:hidden">
+        <div className="border-t border-gray-100 bg-white/95 px-4 py-4 md:hidden backdrop-blur-xl">
           <div className="flex flex-col gap-2">
             <Link
               href="#features"

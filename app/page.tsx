@@ -16,7 +16,7 @@ import { Footer } from "@/components/landing/Footer";
 export default function HomePage() {
   return (
     <LanguageProvider>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white pt-16">
         <Navbar />
         <Hero />
         <Features />

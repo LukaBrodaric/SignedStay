@@ -3,6 +3,7 @@
 import { Home, Building2, Briefcase, Globe, LayoutGrid } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 import { translations } from "@/lib/translations";
+import { AnimatedSection } from "./AnimatedSection";
 
 const targetIcons = [Home, Building2, Briefcase, Globe, LayoutGrid];
 
@@ -11,10 +12,10 @@ export function WhoIsFor() {
   const t = translations[language].target;
 
   return (
-    <section className="bg-indigo-600 py-24">
+    <section id="target" className="bg-indigo-600 py-24">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div>
+          <AnimatedSection animation="fade-right">
             <span className="inline-flex items-center gap-2 bg-white/15 text-white border border-white/20 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
               {t.badge}
             </span>
@@ -24,9 +25,9 @@ export function WhoIsFor() {
             <p className="text-indigo-100 text-lg leading-relaxed">
               {t.body}
             </p>
-          </div>
+          </AnimatedSection>
 
-          <div>
+          <AnimatedSection animation="fade-left" delay={200}>
             <p className="text-indigo-200 font-medium mb-4">{t.sub}</p>
             <div className="space-y-3">
               {t.users.map((user, index) => {
@@ -34,7 +35,7 @@ export function WhoIsFor() {
                 return (
                   <div
                     key={index}
-                    className="flex items-center gap-3 bg-white/10 rounded-xl px-5 py-3.5 backdrop-blur-sm border border-white/10"
+                    className="flex items-center gap-3 bg-white/10 rounded-xl px-5 py-3.5 backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-colors duration-300"
                   >
                     <Icon className="text-indigo-200 w-5 h-5 flex-shrink-0" />
                     <span className="text-white font-medium">{user}</span>
@@ -45,7 +46,7 @@ export function WhoIsFor() {
             <p className="text-indigo-200 text-sm mt-6 italic">
               {t.closing}
             </p>
-          </div>
+          </AnimatedSection>
         </div>
       </div>
     </section>

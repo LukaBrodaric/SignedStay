@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Mail } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 import { translations } from "@/lib/translations";
+import { AnimatedSection } from "./AnimatedSection";
 
 export function FinalCTA() {
   const { language } = useLanguage();
@@ -17,25 +18,29 @@ export function FinalCTA() {
       </div>
       
       <div className="relative text-center max-w-6xl mx-auto px-6">
-        <span className="inline-flex items-center gap-2 bg-white/15 text-white border border-white/20 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
-          {t.badge}
-        </span>
-        <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
-          {t.title}
-        </h2>
-        <p className="text-indigo-200 text-lg mt-4 max-w-xl mx-auto">
-          {t.text}
-        </p>
-        <a
-          href="mailto:info@signedstay.com"
-          className="inline-flex items-center gap-2 bg-white text-indigo-700 hover:bg-indigo-50 font-semibold px-8 py-4 rounded-2xl text-lg shadow-xl hover:shadow-2xl transition-all duration-300 mt-8"
-        >
-          <Mail className="w-5 h-5" />
-          {t.button}
-        </a>
-        <p className="text-indigo-300 text-sm mt-4">
-          {t.subtext}
-        </p>
+        <AnimatedSection>
+          <span className="inline-flex items-center gap-2 bg-white/15 text-white border border-white/20 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
+            {t.badge}
+          </span>
+          <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+            {t.title}
+          </h2>
+          <p className="text-indigo-200 text-lg mt-4 max-w-xl mx-auto">
+            {t.text}
+          </p>
+        </AnimatedSection>
+        <AnimatedSection animation="fade-up" delay={200}>
+          <a
+            href="mailto:info@signedstay.com"
+            className="inline-flex items-center gap-2 bg-white text-indigo-700 hover:bg-indigo-50 font-semibold px-8 py-4 rounded-2xl text-lg shadow-xl hover:shadow-2xl transition-all duration-300 mt-8"
+          >
+            <Mail className="w-5 h-5" />
+            {t.button}
+          </a>
+          <p className="text-indigo-300 text-sm mt-4">
+            {t.subtext}
+          </p>
+        </AnimatedSection>
       </div>
     </section>
   );

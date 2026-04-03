@@ -99,7 +99,7 @@ export default function AdminUsersPage() {
           </Link>
         }
       />
-      <div className="max-w-7xl mx-auto px-8 py-8">
+      <div className="max-w-7xl mx-auto pt-6">
         <Card>
           <CardContent className="p-0">
             <div className="overflow-x-auto">

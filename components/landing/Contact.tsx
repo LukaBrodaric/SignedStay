@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/Input";
 import { Send, Mail, MapPin, Phone } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 import { translations } from "@/lib/translations";
+import { AnimatedSection } from "./AnimatedSection";
+import confetti from "canvas-confetti";
 
 export function Contact() {
   const { language } = useLanguage();
@@ -49,6 +51,31 @@ export function Contact() {
 
       setSent(true);
       setFormData({ name: "", email: "", subject: "", message: "" });
+      
+      const duration = 3000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+      const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+
+      const interval: NodeJS.Timeout = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) return clearInterval(interval);
+
+        const particleCount = 50 * (timeLeft / duration);
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+          colors: ["#6366f1", "#3b82f6", "#8b5cf6", "#ec4899", "#f59e0b"],
+        });
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+          colors: ["#6366f1", "#3b82f6", "#8b5cf6", "#ec4899", "#f59e0b"],
+        });
+      }, 250);
     } catch (err) {
       console.error("Contact form error:", err);
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
@@ -60,7 +87,7 @@ export function Contact() {
   return (
     <section id="contact" className="py-20 bg-gray-50">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="mb-12 text-center">
+        <AnimatedSection className="mb-12 text-center">
           <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-sm font-medium text-indigo-700">
             <Mail className="h-4 w-4" />
             {t.badge}
@@ -71,10 +98,10 @@ export function Contact() {
           <p className="mx-auto max-w-2xl text-lg text-gray-600">
             {t.subtitle}
           </p>
-        </div>
+        </AnimatedSection>
 
         <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-5">
-          <div className="lg:col-span-3">
+          <AnimatedSection animation="fade-left" className="lg:col-span-3">
             <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
               {sent ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -175,9 +202,9 @@ export function Contact() {
                 </form>
               )}
             </div>
-          </div>
+          </AnimatedSection>
 
-          <div className="lg:col-span-2 space-y-6">
+          <AnimatedSection animation="fade-right" className="lg:col-span-2 space-y-6">
             <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-slate-900 mb-6">
                 {t.contactInfo}
@@ -230,7 +257,7 @@ export function Contact() {
                 </p>
               </div>
             </div>
-          </div>
+          </AnimatedSection>
         </div>
       </div>
     </section>
